@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CryptoVerse Pro • Track & Analyze</title>
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      color: #1a1a2e;
+      transition: all 0.3s ease;
+    }
+    body.dark {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      color: #e9edf5;
+    }
+    body.light {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    body.cyberpunk {
+      background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+    }
+    
+    .app-wrapper {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 1.5rem 2rem;
+    }
+    
+    /* Navigation */
+    .nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 1rem 2rem;
+      border-radius: 60px;
+      margin-bottom: 2rem;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    }
+    body.dark .nav-bar { background: rgba(26, 26, 46, 0.95); }
+    body.cyberpunk .nav-bar { background: rgba(15, 12, 41, 0.95); border: 1px solid #00ff9d; }
+    
+    .logo h1 {
+      font-weight: 700;
+      font-size: 1.8rem;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    
+    .nav-controls {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+    
+    .profile-btn, .theme-selector {
+      padding: 0.6rem 1.2rem;
+      border-radius: 30px;
+      border: none;
+      cursor: pointer;
+      font-weight: 500;
+      background: #f0f0f0;
+      transition: 0.2s;
+    }
+    body.dark .profile-btn, body.dark .theme-selector {
+      background: #2a2a4a;
+      color: white;
+    }
+    
+    .theme-selector select {
+      padding: 0.5rem;
+      border-radius: 20px;
+      border: 1px solid #ddd;
+      background: white;
+    }
+    
+    /* Top Crypto Bar */
+    .top-crypto-bar {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 48px;
+      padding: 1.2rem 2rem;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    }
+    body.dark .top-crypto-bar { background: rgba(26, 26, 46, 0.95); }
+    
+    .live-badge {
+      background: #10b981;
+      color: white;
+      padding: 0.3rem 1rem;
+      border-radius: 30px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+    
+    .top-coins {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+    }
+    
+    .top-coin-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      padding: 8px 15px;
+      border-radius: 40px;
+      background: #f8f9fa;
+      transition: all 0.3s;
+      animation: slideIn 0.5s ease;
+    }
+    @keyframes slideIn {
+      from { transform: translateX(-20px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    body.dark .top-coin-item { background: #2a2a4a; }
+    .top-coin-item:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    
+    .price-change.positive { color: #10b981; }
+    .price-change.negative { color: #ef4444; }
+    .price-flash {
+      animation: flash 0.5s ease;
+    }
+    @keyframes flash {
+      0%, 100% { background-color: transparent; }
+      50% { background-color: rgba(16, 185, 129, 0.3); }
+    }
+    
+    /* Search Section */
+    .search-section {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 30px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    }
+    body.dark .search-section { background: rgba(26, 26, 46, 0.95); }
+    
+    .search-wrapper {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 2rem;
+    }
+    .search-wrapper input {
+      flex: 1;
+      padding: 1rem 1.5rem;
+      border: 2px solid #e0e0e0;
+      border-radius: 60px;
+      font-size: 1rem;
+      outline: none;
+      transition: 0.3s;
+    }
+    body.dark .search-wrapper input {
+      background: #2a2a4a;
+      border-color: #4a4a6a;
+      color: white;
+    }
+    .search-wrapper input:focus { border-color: #667eea; }
+    .search-wrapper button {
+      padding: 1rem 2.5rem;
+      border: none;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      font-weight: 600;
+      border-radius: 60px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .search-wrapper button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+    }
+    
+    /* Crypto Grid */
+    .crypto-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1.5rem;
+    }
+    
+    .crypto-card {
+      background: white;
+      border-radius: 20px;
+      padding: 1.5rem;
+      transition: all 0.3s;
+      border: 1px solid rgba(0,0,0,0.1);
+    }
+    body.dark .crypto-card { background: #2a2a4a; }
+    .crypto-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+    
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 1rem;
+    }
+    
+    .favorite-btn {
+      margin-left: auto;
+      cursor: pointer;
+      color: #ffd700;
+      font-size: 1.2rem;
+      transition: 0.2s;
+    }
+    .favorite-btn:hover { transform: scale(1.2); }
+    
+    .moreinfo-btn {
+      margin-top: 1rem;
+      width: 100%;
+      padding: 0.8rem;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      border-radius: 40px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .moreinfo-btn:hover {
+      transform: scale(1.02);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    }
+    
+    /* Detail Page */
+    .detail-container {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 30px;
+      padding: 2rem;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    }
+    body.dark .detail-container { background: rgba(26, 26, 46, 0.95); }
+    
+    .price-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    
+    .price-card {
+      background: linear-gradient(135deg, #667eea20, #764ba220);
+      padding: 1.2rem;
+      border-radius: 15px;
+      text-align: center;
+    }
+    
+    .chart-container { height: 350px; margin: 2rem 0; }
+    
+    .time-buttons {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 1rem;
+    }
+    .time-btn {
+      padding: 0.5rem 1.5rem;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      background: #f0f0f0;
+      transition: 0.2s;
+    }
+    body.dark .time-btn { background: #3a3a5a; color: white; }
+    .time-btn.active {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+    }
+    
+    /* Profile Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+    }
+    .modal-content {
+      background: white;
+      margin: 50px auto;
+      padding: 2rem;
+      border-radius: 30px;
+      max-width: 500px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    body.dark .modal-content { background: #1a1a2e; }
+    
+    .favorites-list {
+      margin-top: 1rem;
+    }
+    .favorite-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.8rem;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    .alert-setting {
+      margin: 1rem 0;
+      padding: 1rem;
+      background: #f8f9fa;
+      border-radius: 10px;
+    }
+    
+    .hidden { display: none !important; }
+    
+    /* News Feed */
+    .news-feed {
+      margin-top: 2rem;
+      padding: 1.5rem;
+      background: rgba(255,255,255,0.5);
+      border-radius: 20px;
+    }
+    body.dark .news-feed { background: rgba(42,42,74,0.5); }
+    
+    .news-item {
+      padding: 0.8rem;
+      border-left: 3px solid #667eea;
+      margin-bottom: 0.8rem;
+      background: rgba(255,255,255,0.3);
+      border-radius: 0 10px 10px 0;
+    }
+    
+    /* Converter */
+    .converter-box {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      padding: 1rem;
+      background: rgba(102,126,234,0.1);
+      border-radius: 15px;
+      margin: 1rem 0;
+    }
+  </style>
+</head>
+<body class="light">
+  <div class="app-wrapper">
+    <!-- Navigation Bar -->
+    <div class="nav-bar">
+      <div class="logo">
+        <h1><i class="fas fa-chart-line"></i> CryptoVerse Pro</h1>
+      </div>
+      <div class="nav-controls">
+        <div class="theme-selector">
+          <select id="themeSelect">
+            <option value="light">Light Theme</option>
+            <option value="dark">Dark Theme</option>
+            <option value="cyberpunk">Cyberpunk</option>
+          </select>
+        </div>
+        <button class="profile-btn" id="profileBtn">
+          <i class="fas fa-user"></i> Profile
+        </button>
+      </div>
+    </div>
+
+    <!-- Index View -->
+    <div id="indexView">
+      <!-- Top Crypto Bar -->
+      <div class="top-crypto-bar">
+        <span class="live-badge"><i class="fas fa-circle"></i> LIVE UPDATES</span>
+        <div class="top-coins" id="topCryptoBar"></div>
+      </div>
+
+      <!-- Search Section -->
+      <div class="search-section">
+        <div class="search-wrapper">
+          <input type="text" id="searchInput" placeholder="Search any cryptocurrency... (e.g., Bitcoin, Ethereum)" autocomplete="off">
+          <button id="searchBtn"><i class="fas fa-search"></i> Search</button>
+        </div>
+        <div id="searchResults" class="crypto-grid"></div>
+      </div>
+    </div>
+
+    <!-- Detail View -->
+    <div id="detailView" class="detail-container hidden">
+      <div style="margin-bottom: 1rem;">
+        <button id="backToSearch" style="padding: 0.5rem 1.5rem; border: none; background: #667eea20; border-radius: 30px; cursor: pointer;">
+          <i class="fas fa-arrow-left"></i> Back to Search
+        </button>
+        <button id="addToFavoritesBtn" style="margin-left: 1rem; padding: 0.5rem 1.5rem; border: none; background: #ffd70020; border-radius: 30px; cursor: pointer;">
+          <i class="fas fa-star"></i> Add to Favorites
+        </button>
+      </div>
+      <div id="coinDetailHeader"></div>
+      
+      <!-- Price in 4 currencies -->
+      <div id="priceMultiCurrency" class="price-grid"></div>
+      
+      <!-- Crypto Converter -->
+      <div class="converter-box">
+        <span><i class="fas fa-exchange-alt"></i> Converter: </span>
+        <input type="number" id="cryptoAmount" value="1" min="0" step="0.01" style="width: 100px; padding: 8px; border-radius: 20px; border: 1px solid #ddd;">
+        <span id="convertFromSymbol">BTC</span> = 
+        <strong><span id="convertResult">--</span> USD</strong>
+        <select id="convertToCurrency" style="margin-left: 10px; padding: 5px; border-radius: 15px;">
+          <option value="usd">USD</option>
+          <option value="eur">EUR</option>
+          <option value="gbp">GBP</option>
+          <option value="jpy">JPY</option>
+        </select>
+      </div>
+      
+      <!-- Interactive Chart -->
+      <div class="time-buttons">
+        <button class="time-btn active" data-days="1">24H</button>
+        <button class="time-btn" data-days="7">7D</button>
+        <button class="time-btn" data-days="30">1M</button>
+        <button class="time-btn" data-days="90">3M</button>
+        <button class="time-btn" data-days="365">1Y</button>
+        <button class="time-btn" data-days="max">ALL</button>
+      </div>
+      <div class="chart-container">
+        <canvas id="priceChart"></canvas>
+      </div>
+      
+      <!-- News Feed -->
+      <div class="news-feed">
+        <h3><i class="far fa-newspaper"></i> Crypto News & Updates</h3>
+        <div id="newsContainer"></div>
+      </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div id="profileModal" class="modal">
+      <div class="modal-content">
+        <h2><i class="fas fa-user-circle"></i> Your Profile</h2>
+        <button id="closeModal" style="float: right; border: none; background: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+        
+        <div style="margin-top: 2rem;">
+          <h3>Favorite Cryptocurrencies</h3>
+          <div id="favoritesList" class="favorites-list"></div>
+        </div>
+        
+        <div style="margin-top: 2rem;">
+          <h3>Price Alerts</h3>
+          <div class="alert-setting">
+            <select id="alertCoinSelect" style="padding: 8px; border-radius: 10px; margin-right: 10px;">
+              <option value="">Select coin</option>
+            </select>
+            <input type="number" id="alertPrice" placeholder="Target price (USD)" style="padding: 8px; border-radius: 10px; width: 150px;">
+            <button id="setAlertBtn" style="padding: 8px 15px; background: #667eea; color: white; border: none; border-radius: 10px; margin-left: 10px;">Set Alert</button>
+          </div>
+          <div id="alertsList"></div>
+        </div>
+        
+        <div style="margin-top: 2rem;">
+          <h3>Portfolio Tracker</h3>
+          <div id="portfolioSection">
+            <p>Add coins to track your portfolio performance</p>
+            <button id="clearPortfolioBtn" style="padding: 8px 15px; background: #ef4444; color: white; border: none; border-radius: 10px;">Clear Portfolio</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ========== COMPLETE JAVASCRIPT APPLICATION ==========
+
+    
+    (function() {
+      "use strict";
+      
+      // ------- STATE MANAGEMENT --------
+      const state = {
+        currentTheme: 'light',
+        topCoins: [],
+        searchResults: [],
+        currentCoin: null,
+        chartInstance: null,
+        favorites: JSON.parse(localStorage.getItem('cryptoFavorites') || '[]'),
+        alerts: JSON.parse(localStorage.getItem('cryptoAlerts') || '[]'),
+        portfolio: JSON.parse(localStorage.getItem('cryptoPortfolio') || '[]'),
+        previousPrices: {}
+      };
+      
+      // ---------- DOM ELEMENTS ----------
+      const indexView = document.getElementById('indexView');
+      const detailView = document.getElementById('detailView');
+      const topBarDiv = document.getElementById('topCryptoBar');
+      const searchResultsDiv = document.getElementById('searchResults');
+      const searchInput = document.getElementById('searchInput');
+      const searchBtn = document.getElementById('searchBtn');
+      const themeSelect = document.getElementById('themeSelect');
+      const profileBtn = document.getElementById('profileBtn');
+      const profileModal = document.getElementById('profileModal');
+      const closeModal = document.getElementById('closeModal');
+      const backBtn = document.getElementById('backToSearch');
+      const addToFavoritesBtn = document.getElementById('addToFavoritesBtn');
+      const coinDetailHeader = document.getElementById('coinDetailHeader');
+      const priceMultiDiv = document.getElementById('priceMultiCurrency');
+      const ctx = document.getElementById('priceChart').getContext('2d');
+      const cryptoAmountInput = document.getElementById('cryptoAmount');
+      const convertResultSpan = document.getElementById('convertResult');
+      const convertFromSymbol = document.getElementById('convertFromSymbol');
+      const convertToCurrency = document.getElementById('convertToCurrency');
+      const newsContainer = document.getElementById('newsContainer');
+      const favoritesList = document.getElementById('favoritesList');
+      const alertCoinSelect = document.getElementById('alertCoinSelect');
+      const alertPrice = document.getElementById('alertPrice');
+      const setAlertBtn = document.getElementById('setAlertBtn');
+      const alertsList = document.getElementById('alertsList');
+      
+      // ---------- API CONFIG ----------
+      const API_BASE = 'https://api.coingecko.com/api/v3';
+      
+      // ---------- UTILITY FUNCTIONS ----------
+      function saveToLocalStorage() {
+        localStorage.setItem('cryptoFavorites', JSON.stringify(state.favorites));
+        localStorage.setItem('cryptoAlerts', JSON.stringify(state.alerts));
+        localStorage.setItem('cryptoPortfolio', JSON.stringify(state.portfolio));
+      }
+      
+      function showNotification(message, type = 'info') {
+        // Simple notification
+        alert(message);
+      }
+      
+      // ---------- REAL-TIME UPDATES WITH ANIMATION ----------
+      async function fetchTopCoins() {
+        try {
+          const res = await fetch(`${API_BASE}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=10&page=1&sparkline=false&price_change_percentage=24h`);
+          const data = await res.json();
+          
+          // Check for price changes to trigger animation
+          data.forEach(coin => {
+            if (state.previousPrices[coin.id] && state.previousPrices[coin.id] !== coin.current_price) {
+              coin.priceChanged = true;
+            } else {
+              coin.priceChanged = false;
+            }
+            state.previousPrices[coin.id] = coin.current_price;
+          });
+          
+          state.topCoins = data;
+          renderTopBar();
+          
+          // Update alert dropdown
+          updateAlertCoinSelect();
+        } catch (e) {
+          console.error('Error fetching top coins:', e);
+        }
+      }
+      
+      function renderTopBar() {
+        let html = '';
+        state.topCoins.slice(0, 7).forEach(coin => {
+          const change = coin.price_change_percentage_24h?.toFixed(2) || 0;
+          const changeClass = change >= 0 ? 'positive' : 'negative';
+          const flashClass = coin.priceChanged ? 'price-flash' : '';
+          
+          html += `<div class="top-coin-item ${flashClass}" data-id="${coin.id}" data-symbol="${coin.symbol}">
+            <img src="${coin.image}" width="24" style="border-radius:50%;">
+            <span style="font-weight:600;">${coin.symbol.toUpperCase()}</span>
+            <span>$${coin.current_price.toLocaleString()}</span>
+            <span class="price-change ${changeClass}">
+              <i class="fas fa-${change >= 0 ? 'arrow-up' : 'arrow-down'}"></i> ${Math.abs(change)}%
+            </span>
+          </div>`;
+        });
+        topBarDiv.innerHTML = html;
+        
+        // Add click handlers
+        document.querySelectorAll('.top-coin-item').forEach(el => {
+          el.addEventListener('click', () => {
+            const id = el.dataset.id;
+            if (id) showDetailPage(id);
+          });
+        });
+      }
+      
+      // ---------- SEARCH FUNCTIONALITY ----------
+      async function performSearch(query) {
+        if (!query.trim()) return;
+        try {
+          const res = await fetch(`${API_BASE}/search?query=${encodeURIComponent(query)}`);
+          const data = await res.json();
+          const coins = data.coins.slice(0, 15);
+          
+          if (coins.length === 0) {
+            searchResultsDiv.innerHTML = '<p>No cryptocurrencies found. Try another search.</p>';
+            return;
+          }
+          
+          const ids = coins.map(c => c.id).join(',');
+          const marketRes = await fetch(`${API_BASE}/coins/markets?vs_currency=usd&ids=${ids}&order=market_cap_desc&per_page=15&sparkline=false&price_change_percentage=24h`);
+          const marketData = await marketRes.json();
+          
+          state.searchResults = marketData;
+          renderSearchResults();
+        } catch (e) {
+          console.error('Search error:', e);
+        }
+      }
+      
+      function renderSearchResults() {
+        if (!state.searchResults.length) {
+          searchResultsDiv.innerHTML = '<p>No results found.</p>';
+          return;
+        }
+        
+        let cards = '';
+        state.searchResults.forEach(coin => {
+          const change = coin.price_change_percentage_24h?.toFixed(2) || 0;
+          const changeClass = change >= 0 ? 'positive' : 'negative';
+          const isFavorite = state.favorites.includes(coin.id);
+          
+          cards += `<div class="crypto-card">
+            <div class="card-header">
+              <img src="${coin.image}" width="32" height="32">
+              <span style="font-weight:700;">${coin.name}</span>
+              <span style="background: #667eea20; padding: 4px 10px; border-radius: 30px; font-size: 0.85rem;">${coin.symbol.toUpperCase()}</span>
+              <span class="favorite-btn" data-id="${coin.id}" style="color: ${isFavorite ? '#ffd700' : '#ccc'};">
+                <i class="fas fa-star"></i>
+              </span>
+            </div>
+            <div style="font-size: 1.3rem; font-weight: 600;">$${coin.current_price?.toLocaleString() || '—'}</div>
+            <div class="${changeClass}">
+              <i class="fas fa-${change >= 0 ? 'arrow-up' : 'arrow-down'}"></i> ${Math.abs(change)}%
+            </div>
+            <button class="moreinfo-btn" data-id="${coin.id}" data-symbol="${coin.symbol}">
+              More Info <i class="fas fa-arrow-right"></i>
+            </button>
+          </div>`;
+        });
+        
+        searchResultsDiv.innerHTML = cards;
+        
+        // Add favorite toggle handlers
+        document.querySelectorAll('.favorite-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const id = btn.dataset.id;
+            toggleFavorite(id);
+            btn.style.color = state.favorites.includes(id) ? '#ffd700' : '#ccc';
+          });
+        });
+        
+        // Add more info handlers
+        document.querySelectorAll('.moreinfo-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const id = btn.dataset.id;
+            showDetailPage(id);
+          });
+        });
+      }
+      
+      // ---------- FAVORITES MANAGEMENT ----------
+      function toggleFavorite(coinId) {
+        const index = state.favorites.indexOf(coinId);
+        if (index > -1) {
+          state.favorites.splice(index, 1);
+        } else {
+          state.favorites.push(coinId);
+        }
+        saveToLocalStorage();
+        renderFavorites();
+      }
+      
+      function renderFavorites() {
+        if (!favoritesList) return;
+        
+        if (state.favorites.length === 0) {
+          favoritesList.innerHTML = '<p>No favorites yet. Star some cryptocurrencies!</p>';
+          return;
+        }
+        
+        // Fetch details for favorites
+        Promise.all(state.favorites.map(id => 
+          fetch(`${API_BASE}/coins/${id}?localization=false&tickers=false&market_data=true`)
+            .then(res => res.json())
+        )).then(coins => {
+          let html = '';
+          coins.forEach(coin => {
+            html += `<div class="favorite-item">
+              <div>
+                <img src="${coin.image.small}" width="20"> 
+                <strong>${coin.name}</strong> (${coin.symbol.toUpperCase()})
+              </div>
+              <div>
+                $${coin.market_data.current_price.usd.toLocaleString()}
+                <button onclick="removeFavorite('${coin.id}')" style="margin-left: 10px; color: #ef4444; border: none; background: none; cursor: pointer;">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>`;
+          });
+          favoritesList.innerHTML = html;
+        });
+      }
+      
+      window.removeFavorite = function(id) {
+        toggleFavorite(id);
+      };
+      
+      // -------- DETAIL PAGE ----------
+      async function showDetailPage(coinId) {
+        indexView.classList.add('hidden');
+        detailView.classList.remove('hidden');
+        window.scrollTo(0, 0);
+        
+        try {
+          const res = await fetch(`${API_BASE}/coins/${coinId}?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false`);
+          const coin = await res.json();
+          state.currentCoin = coin;
+          
+          // Update header
+          coinDetailHeader.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 1.5rem;">
+              <img src="${coin.image.large}" width="60">
+              <div>
+                <h2>${coin.name} (${coin.symbol.toUpperCase()})</h2>
+                <span class="live-badge">Rank #${coin.market_cap_rank}</span>
+              </div>
+            </div>
+          `;
+          
+          // Update favorite button
+          addToFavoritesBtn.innerHTML = state.favorites.includes(coinId) 
+            ? '<i class="fas fa-star"></i> Remove from Favorites' 
+            : '<i class="far fa-star"></i> Add to Favorites';
+          
+          // Prices in 4 currencies
+          const market = coin.market_data;
+          priceMultiDiv.innerHTML = `
+            <div class="price-card">
+              <div>🇺🇸 USD</div>
+              <strong>$${market.current_price.usd.toLocaleString()}</strong>
+              <small class="${market.price_change_percentage_24h >= 0 ? 'positive' : 'negative'}">
+                ${market.price_change_percentage_24h?.toFixed(2)}%
+              </small>
+            </div>
+            <div class="price-card">
+              <div>🇪🇺 EUR</div>
+              <strong>€${market.current_price.eur.toLocaleString()}</strong>
+            </div>
+            <div class="price-card">
+              <div>₿ BTC</div>
+              <strong>${market.current_price.btc.toFixed(8)}</strong>
+            </div>
+            <div class="price-card">
+              <div>Ξ ETH</div>
+              <strong>${market.current_price.eth.toFixed(8)}</strong>
+            </div>
+          `;
+          
+          // Converter setup
+          convertFromSymbol.textContent = coin.symbol.toUpperCase();
+          updateConverter();
+          
+          // News feed
+          newsContainer.innerHTML = `
+            <div class="news-item">
+              <strong>📈 Market Update:</strong> ${coin.name} is ${market.price_change_percentage_24h > 0 ? 'up' : 'down'} 
+              ${Math.abs(market.price_change_percentage_24h?.toFixed(2))}% in the last 24 hours.
+            </div>
+            <div class="news-item">
+              <strong>💰 Market Cap:</strong> $${(market.market_cap.usd / 1e9).toFixed(2)} Billion
+            </div>
+            <div class="news-item">
+              <strong>📊 24h Volume:</strong> $${(market.total_volume.usd / 1e6).toFixed(2)} Million
+            </div>
+            <div class="news-item">
+              <strong>🔗 Official Website:</strong> <a href="${coin.links.homepage[0]}" target="_blank">${coin.links.homepage[0]}</a>
+            </div>
+          `;
+          
+          // Load chart with default 7 days
+          await fetchChartData(coinId, 7);
+          
+          // Add to portfolio tracking
+          if (!state.portfolio.includes(coinId)) {
+            state.portfolio.push(coinId);
+            saveToLocalStorage();
+          }
+          
+        } catch (e) {
+          console.error('Error loading coin details:', e);
+        }
+      }
+      
+      function updateConverter() {
+        const amount = parseFloat(cryptoAmountInput.value) || 0;
+        const currency = convertToCurrency.value;
+        const price = state.currentCoin?.market_data?.current_price[currency] || 0;
+        const result = amount * price;
+        convertResultSpan.textContent = `${result.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} ${currency.toUpperCase()}`;
+      }
+      
+      // -------- INTERACTIVE CHART ----------
+      async function fetchChartData(coinId, days) {
+        try {
+          const res = await fetch(`${API_BASE}/coins/${coinId}/market_chart?vs_currency=usd&days=${days}`);
+          const data = await res.json();
+          const prices = data.prices;
+          
+          const labels = prices.map(p => {
+            const date = new Date(p[0]);
+            return days > 90 ? date.toLocaleDateString() : date.toLocaleDateString(undefined, {month: 'short', day: 'numeric'});
+          });
+          
+          const values = prices.map(p => p[1]);
+          
+          if (state.chartInstance) {
+            state.chartInstance.destroy();
+          }
+          
+          state.chartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+              labels: labels,
+              datasets: [{
+                label: 'Price (USD)',
+                data: values,
+                borderColor: '#667eea',
+                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                tension: 0.4,
+                fill: true,
+                pointRadius: 0,
+                borderWidth: 2
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                tooltip: {
+                  mode: 'index',
+                  intersect: false
+                },
+                legend: {
+                  display: false
+                }
+              },
+              interaction: {
+                mode: 'nearest',
+                axis: 'x',
+                intersect: false
+              }
+            }
+          });
+        } catch (e) {
+          console.error('Chart error:', e);
+        }
+      }
+      
+      // ---------- USER PROFILES & ALERTS ---------
+      function updateAlertCoinSelect() {
+        if (!alertCoinSelect) return;
+        let options = '<option value="">Select a cryptocurrency</option>';
+        state.topCoins.forEach(coin => {
+          options += `<option value="${coin.id}">${coin.name} (${coin.symbol.toUpperCase()})</option>`;
+        });
+        alertCoinSelect.innerHTML = options;
+      }
+      
+      function renderAlerts() {
+        if (!alertsList) return;
+        if (state.alerts.length === 0) {
+          alertsList.innerHTML = '<p>No price alerts set.</p>';
+          return;
+        }
+        
+        let html = '';
+        state.alerts.forEach((alert, index) => {
+          html += `<div style="padding: 8px; background: #f0f0f0; margin: 5px 0; border-radius: 8px;">
+            ${alert.coinName}: $${alert.targetPrice} 
+            <button onclick="deleteAlert(${index})" style="float: right; color: #ef4444; border: none; background: none; cursor: pointer;">Delete</button>
+          </div>`;
+        });
+        alertsList.innerHTML = html;
+      }
+      
+      window.deleteAlert = function(index) {
+        state.alerts.splice(index, 1);
+        saveToLocalStorage();
+        renderAlerts();
+      };
+      
+      function checkAlerts() {
+        state.alerts.forEach(alert => {
+          const coin = state.topCoins.find(c => c.id === alert.coinId);
+          if (coin && coin.current_price >= alert.targetPrice) {
+            showNotification(`${alert.coinName} has reached $${alert.targetPrice}!`, 'success');
+            // Remove triggered alert
+            state.alerts = state.alerts.filter(a => a.coinId !== alert.coinId || a.targetPrice !== alert.targetPrice);
+            saveToLocalStorage();
+            renderAlerts();
+          }
+        });
+      }
+      
+      // ---------- EVENT LISTENERS ----------
+      searchBtn.addEventListener('click', () => performSearch(searchInput.value));
+      searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') performSearch(searchInput.value);
+      });
+      
+      themeSelect.addEventListener('change', (e) => {
+        document.body.className = e.target.value;
+        state.currentTheme = e.target.value;
+      });
+      
+      profileBtn.addEventListener('click', () => {
+        profileModal.style.display = 'block';
+        renderFavorites();
+        renderAlerts();
+        updateAlertCoinSelect();
+      });
+      
+      closeModal.addEventListener('click', () => {
+        profileModal.style.display = 'none';
+      });
+      
+      window.addEventListener('click', (e) => {
+        if (e.target === profileModal) {
+          profileModal.style.display = 'none';
+        }
+      });
+      
+      backBtn.addEventListener('click', () => {
+        detailView.classList.add('hidden');
+        indexView.classList.remove('hidden');
+      });
+      
+      addToFavoritesBtn.addEventListener('click', () => {
+        if (state.currentCoin) {
+          toggleFavorite(state.currentCoin.id);
+          addToFavoritesBtn.innerHTML = state.favorites.includes(state.currentCoin.id)
+            ? '<i class="fas fa-star"></i> Remove from Favorites'
+            : '<i class="far fa-star"></i> Add to Favorites';
+        }
+      });
+      
+      cryptoAmountInput.addEventListener('input', updateConverter);
+      convertToCurrency.addEventListener('change', updateConverter);
+      
+      document.querySelectorAll('.time-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const days = btn.dataset.days;
+          if (state.currentCoin) {
+            await fetchChartData(state.currentCoin.id, days);
+          }
+        });
+      });
+      
+      setAlertBtn.addEventListener('click', () => {
+        const coinId = alertCoinSelect.value;
+        const price = parseFloat(alertPrice.value);
+        
+        if (!coinId || !price) {
+          alert('Please select a coin and enter a target price');
+          return;
+        }
+        
+        const coin = state.topCoins.find(c => c.id === coinId);
+        state.alerts.push({
+          coinId: coinId,
+          coinName: coin.name,
+          targetPrice: price
+        });
+        
+        saveToLocalStorage();
+        renderAlerts();
+        alertPrice.value = '';
+        showNotification(`Alert set for ${coin.name} at $${price}`);
+      });
+      
+      document.getElementById('clearPortfolioBtn')?.addEventListener('click', () => {
+        state.portfolio = [];
+        saveToLocalStorage();
+        showNotification('Portfolio cleared');
+      });
+      
+      // ---------- INITIALIZATION ----------
+      async function init() {
+        await fetchTopCoins();
+        await performSearch('bitcoin');
+        
+        // Real-time updates every 30 seconds
+        setInterval(async () => {
+          await fetchTopCoins();
+          checkAlerts();
+          if (state.currentCoin && !detailView.classList.contains('hidden')) {
+            const res = await fetch(`${API_BASE}/coins/${state.currentCoin.id}?localization=false&tickers=false&market_data=true`);
+            const coin = await res.json();
+            state.currentCoin = coin;
+            updateConverter();
+          }
+        }, 30000);
+      }
+      
+      init();
+    })();
+  </script>
+</body>
+</html>
