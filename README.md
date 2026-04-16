@@ -1,4 +1,4 @@
-# 🚀 CryptoVerse Pro - Cryptocurrency Search & Tracking Application
+# 🚀 Cryp-Search-Application - Cryptocurrency Search & Tracking Application
 
 ![CryptoVerse Pro](https://img.shields.io/badge/Status-Active-brightgreen)
 ![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-yellow)
@@ -7,14 +7,14 @@
 
 ## 📊 Project Overview
 
-CryptoVerse Pro is a comprehensive cryptocurrency tracking web application that allows users to search, track, and analyze cryptocurrencies in real-time. Built with vanilla JavaScript, HTML5, and CSS3, this application demonstrates advanced front-end development concepts including API integration, state management, and interactive data visualization.
+Crypto-Search-Application is a comprehensive cryptocurrency tracking web application that allows users to search, track, and analyze cryptocurrencies in real-time. Built with vanilla JavaScript, HTML5, and CSS3, this application demonstrates advanced front-end development concepts including API integration, state management, and interactive data visualization.
 
 ### 🌐 Live Demo
-**[View Live Application](https://your-username.github.io/crypto-search-app/)**
+**[View Live Application](https://lijoks.github.io/Crypto-Search-Application/)**
 
 ## ✨ Features Implemented
 
-### Core Functionality (Rubrics 1-4)
+### Core Functionality 
 - ✅ **Intuitive UI Design** - Clean, responsive interface with consistent design language
 - ✅ **Real-Time Top Cryptocurrencies** - Live-updating bar showing top 10 cryptocurrencies by market cap
 - ✅ **Advanced Search** - Search any cryptocurrency with detailed results
@@ -23,7 +23,7 @@ CryptoVerse Pro is a comprehensive cryptocurrency tracking web application that 
   - Interactive price charts with multiple timeframes
   - Market statistics and metrics
 
-### Creative Features (Rubrics 5 - All 11 Points)
+### Creative Features 
 1. ✅ **Interactive Charts** - Multi-timeframe analysis (24H, 7D, 1M, 3M, 1Y, ALL)
 2. ✅ **Real-Time Updates** - Live price updates every 30 seconds with visual animations
 3. ✅ **Cryptocurrency Icons** - Unique identifiers for each cryptocurrency
